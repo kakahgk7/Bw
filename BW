@@ -1,0 +1,652 @@
+--[[
+免责声明：
+本代码、示例仅用于计算机技术学习、原理研究，仅供教育参考。
+禁止将本内容用于作弊、扰乱游戏服务、破坏他人游戏体验、绕过平台安全机制等违反Roblox用户协议以及法律法规的行为。
+使用者一切实际操作行为与产生的全部后果，均由使用者本人自行承担，与代码作者无关。
+使用即代表同意本声明。
+]]
+--[[
+DISCLAIMER:
+All code is for educational and research purposes only.
+Do not use for cheating, exploiting or violating platform Terms of Service.
+All risks and consequences shall be borne solely by the end‑user.
+By using this code, you agree to this disclaimer.
+]]
+print("BW_START")
+
+local P = game:GetService("Players")
+local U = game:GetService("UserInputService")
+local R = game:GetService("RunService")
+local C = game:GetService("CoreGui")
+local TS = game:GetService("TweenService")
+local pl = P.LocalPlayer
+
+local pg = nil
+pcall(function()
+    pg = pl:WaitForChild("PlayerGui", 5)
+end)
+if not pg then pg = C end
+
+local old = pg:FindFirstChild("BW_HUB")
+if old then old:Destroy() end
+
+local g = Instance.new("ScreenGui")
+g.Name = "BW_HUB"
+g.ResetOnSpawn = false
+g.Parent = pg
+
+local function rc(o, r)
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, r)
+    c.Parent = o
+end
+
+local il = Instance.new("TextButton")
+il.Size = UDim2.new(0, 170, 0, 32)
+il.Position = UDim2.new(0.5, -85, 0, 15)
+il.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+il.BorderSizePixel = 0
+il.Text = " BW"
+il.TextXAlignment = Enum.TextXAlignment.Left
+il.TextColor3 = Color3.fromRGB(120, 180, 255)
+il.Font = Enum.Font.SourceSansBold
+il.TextSize = 14
+il.AutoButtonColor = false
+il.Parent = g
+rc(il, 16)
+
+local cb = Instance.new("TextButton")
+cb.Size = UDim2.new(0, 24, 0, 24)
+cb.Position = UDim2.new(1, -28, 0.5, -12)
+cb.BackgroundColor3 = Color3.fromRGB(100, 50, 50)
+cb.BorderSizePixel = 0
+cb.Text = "X"
+cb.TextColor3 = Color3.fromRGB(255, 255, 255)
+cb.Font = Enum.Font.SourceSansBold
+cb.TextSize = 12
+cb.Parent = il
+rc(cb, 8)
+
+local clk = Instance.new("TextLabel")
+clk.Size = UDim2.new(0, 45, 0, 20)
+clk.Position = UDim2.new(1, -78, 0.5, -10)
+clk.BackgroundTransparency = 1
+clk.Text = "--:--"
+clk.TextColor3 = Color3.fromRGB(120, 180, 255)
+clk.Font = Enum.Font.SourceSansBold
+clk.TextSize = 11
+clk.Parent = il
+rc(clk, 10)
+
+local clk_conn = R.Heartbeat:Connect(function()
+    local t = os.date("%H:%M")
+    if clk.Text ~= t then
+        clk.Text = t
+    end
+end)
+
+local mn = Instance.new("ScrollingFrame")
+mn.Size = UDim2.new(0, 105, 0, 0)
+mn.Position = UDim2.new(0.5, -52, 0, 36)
+mn.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+mn.BorderSizePixel = 0
+mn.Visible = false
+mn.ScrollBarThickness = 4
+mn.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 120)
+mn.AutomaticCanvasSize = Enum.AutomaticSize.Y
+mn.CanvasSize = UDim2.new(0, 0, 0, 0)
+mn.Parent = il
+rc(mn, 10)
+
+local mn_lay = Instance.new("UIListLayout")
+mn_lay.Padding = UDim.new(0, 4)
+mn_lay.HorizontalAlignment = Enum.HorizontalAlignment.Center
+mn_lay.Parent = mn
+
+local function bt(t)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0, 90, 0, 22)
+    b.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+    b.BorderSizePixel = 0
+    b.Text = t
+    b.TextColor3 = Color3.fromRGB(255, 255, 255)
+    b.Font = Enum.Font.SourceSansBold
+    b.TextSize = 11
+    b.Parent = mn
+    rc(b, 8)
+    return b
+end
+
+local fb = bt("飞行: 关")
+local wb = bt("穿墙: 关")
+local eb = bt("透视: 关")
+local sb = bt("速度: 60")
+local pb = bt("秒交互: 关")
+local nb = bt("昵称透视: 关")
+local ub = bt("用户名透视: 关")
+local tb = bt("传送玩家")
+local msb = bt("移速: 16")
+local ib = bt("无限跳: 关")
+
+local ms_conn = nil
+local ij = false
+local ij_conn = nil
+
+local pl_mn = Instance.new("Frame")
+pl_mn.Size = UDim2.new(0, 105, 0, 0)
+pl_mn.Position = UDim2.new(0.5, -52, 0, 36)
+pl_mn.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+pl_mn.BorderSizePixel = 0
+pl_mn.Visible = false
+pl_mn.Parent = il
+rc(pl_mn, 10)
+
+local pl_t = Instance.new("TextLabel")
+pl_t.Size = UDim2.new(1, -10, 0, 18)
+pl_t.Position = UDim2.new(0, 5, 0, 3)
+pl_t.BackgroundTransparency = 1
+pl_t.Text = "选择玩家"
+pl_t.TextColor3 = Color3.fromRGB(120, 180, 255)
+pl_t.Font = Enum.Font.SourceSansBold
+pl_t.TextSize = 11
+pl_t.Parent = pl_mn
+
+local pl_sc = Instance.new("ScrollingFrame")
+pl_sc.Size = UDim2.new(1, -10, 0, 130)
+pl_sc.Position = UDim2.new(0, 5, 0, 22)
+pl_sc.BackgroundTransparency = 1
+pl_sc.ScrollBarThickness = 4
+pl_sc.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 120)
+pl_sc.AutomaticCanvasSize = Enum.AutomaticSize.Y
+pl_sc.CanvasSize = UDim2.new(0, 0, 0, 0)
+pl_sc.Parent = pl_mn
+
+local pl_lay = Instance.new("UIListLayout")
+pl_lay.Padding = UDim.new(0, 4)
+pl_lay.HorizontalAlignment = Enum.HorizontalAlignment.Center
+pl_lay.Parent = pl_sc
+
+local tp_b = Instance.new("TextButton")
+tp_b.Size = UDim2.new(0, 95, 0, 20)
+tp_b.Position = UDim2.new(0.5, -47.5, 0, 156)
+tp_b.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+tp_b.BorderSizePixel = 0
+tp_b.Text = "传送至此"
+tp_b.TextColor3 = Color3.fromRGB(255, 255, 255)
+tp_b.Font = Enum.Font.SourceSansBold
+tp_b.TextSize = 11
+tp_b.Parent = pl_mn
+rc(tp_b, 8)
+
+local bk_b = Instance.new("TextButton")
+bk_b.Size = UDim2.new(0, 95, 0, 16)
+bk_b.Position = UDim2.new(0.5, -47.5, 0, 180)
+bk_b.BackgroundColor3 = Color3.fromRGB(100, 50, 50)
+bk_b.BorderSizePixel = 0
+bk_b.Text = "返回"
+bk_b.TextColor3 = Color3.fromRGB(255, 255, 255)
+bk_b.Font = Enum.Font.SourceSansBold
+bk_b.TextSize = 10
+bk_b.Parent = pl_mn
+rc(bk_b, 8)
+
+local op = false
+local dg = false
+local mv = false
+local sm2 = nil
+local sp2 = il.Position
+
+il.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+        dg = true
+        mv = false
+        sm2 = i.Position
+        sp2 = il.Position
+    end
+end)
+
+U.InputChanged:Connect(function(i)
+    if dg and sm2 then
+        local d = i.Position - sm2
+        if d.Magnitude > 6 then mv = true end
+        il.Position = UDim2.new(
+            sp2.X.Scale, sp2.X.Offset + d.X,
+            sp2.Y.Scale, sp2.Y.Offset + d.Y
+        )
+    end
+end)
+
+local MN_H = 150
+local PL_H = 200
+mn.ClipsDescendants = true
+pl_mn.ClipsDescendants = true
+
+local function showMenu(frame, h)
+    frame.Visible = true
+    frame.Size = UDim2.new(0, 105, 0, 0)
+    TS:Create(frame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Size = UDim2.new(0, 105, 0, h)
+    }):Play()
+end
+
+local function hideMenu(frame, h)
+    frame.Size = UDim2.new(0, 105, 0, h)
+    local tw = TS:Create(frame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        Size = UDim2.new(0, 105, 0, 0)
+    })
+    tw:Play()
+    task.delay(0.2, function()
+        if frame and frame.Parent then
+            frame.Visible = false
+            frame.Size = UDim2.new(0, 105, 0, h)
+        end
+    end)
+end
+
+U.InputEnded:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+        if dg and not mv then
+            op = not op
+            if op then
+                showMenu(mn, MN_H)
+            else
+                hideMenu(mn, MN_H)
+            end
+            hideMenu(pl_mn, PL_H)
+        end
+        dg = false
+        sm2 = nil
+    end
+end)
+
+local fy = false
+local wl = false
+local es = false
+local ps = false
+local ns = false
+local us = false
+local sd = 60
+local bv = nil
+local bg = nil
+local fc = nil
+local wc = nil
+local pc = nil
+local ec = {}
+local sel_pl = nil
+
+local function sf()
+    if fc then fc:Disconnect() fc = nil end
+    if bv then bv:Destroy() end
+    if bg then bg:Destroy() end
+    local c = pl.Character
+    if c then
+        local h = c:FindFirstChildOfClass("Humanoid")
+        if h then h.PlatformStand = false end
+    end
+end
+
+local function bf()
+    local c = pl.Character
+    if not c then return end
+    local h = c:FindFirstChildOfClass("Humanoid")
+    local r = c:FindFirstChild("HumanoidRootPart")
+    if not h or not r then return end
+    h.PlatformStand = true
+    bv = Instance.new("BodyVelocity")
+    bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+    bv.Velocity = Vector3.zero
+    bv.Parent = r
+    bg = Instance.new("BodyGyro")
+    bg.MaxTorque = Vector3.new(1e5, 1e5, 1e5)
+    bg.P = 1e4
+    bg.CFrame = r.CFrame
+    bg.Parent = r
+    fc = R.RenderStepped:Connect(function()
+        local cm = workspace.CurrentCamera
+        if not r.Parent or not cm then
+            sf()
+            return
+        end
+        local m = h.MoveDirection
+        if m.Magnitude > 0 then
+            bv.Velocity = (m + Vector3.new(0, cm.CFrame.LookVector.Y, 0)).Unit * sd
+        else
+            bv.Velocity = Vector3.zero
+        end
+        bg.CFrame = cm.CFrame
+    end)
+end
+
+local function sw()
+    if wc then wc:Disconnect() wc = nil end
+    local c = pl.Character
+    if c then
+        for _, v in pairs(c:GetDescendants()) do
+            if v:IsA("BasePart") then v.CanCollide = true end
+        end
+    end
+end
+
+local function bw()
+    wc = R.Stepped:Connect(function()
+        local c = pl.Character
+        if c then
+            for _, v in pairs(c:GetDescendants()) do
+                if v:IsA("BasePart") then v.CanCollide = false end
+            end
+        end
+    end)
+end
+
+local function be()
+    for _, p in pairs(P:GetPlayers()) do
+        if p ~= pl then
+            local f = function()
+                local c = p.Character
+                if c and not c:FindFirstChild("BWESP") then
+                    local h = Instance.new("Highlight")
+                    h.Name = "BWESP"
+                    h.FillColor = Color3.fromRGB(255, 0, 0)
+                    h.Parent = c
+                end
+            end
+            if p.Character then f() end
+            ec[p] = p.CharacterAdded:Connect(f)
+        end
+    end
+end
+
+local function bn()
+    for _, p in pairs(P:GetPlayers()) do
+        if p ~= pl then
+            local f = function()
+                local c = p.Character
+                if c and not c:FindFirstChild("BWNAME") then
+                    local b2 = Instance.new("BillboardGui")
+                    b2.Name = "BWNAME"
+                    b2.Size = UDim2.new(0, 100, 0, 20)
+                    b2.AlwaysOnTop = true
+                    b2.StudsOffset = Vector3.new(0, 3, 0)
+                    b2.Enabled = true
+                    b2.Parent = c
+                    local t = Instance.new("TextLabel")
+                    t.Size = UDim2.new(1, 0, 1, 0)
+                    t.BackgroundTransparency = 1
+                    t.Text = p.DisplayName
+                    t.TextColor3 = Color3.fromRGB(255, 0, 0)
+                    t.Font = Enum.Font.SourceSansBold
+                    t.TextSize = 14
+                    t.Parent = b2
+                end
+            end
+            if p.Character then f() end
+        end
+    end
+end
+
+local function bu()
+    for _, p in pairs(P:GetPlayers()) do
+        if p ~= pl then
+            local f = function()
+                local c = p.Character
+                if c and not c:FindFirstChild("BWUNAME") then
+                    local b2 = Instance.new("BillboardGui")
+                    b2.Name = "BWUNAME"
+                    b2.Size = UDim2.new(0, 100, 0, 20)
+                    b2.AlwaysOnTop = true
+                    b2.StudsOffset = Vector3.new(0, 5, 0)
+                    b2.Enabled = true
+                    b2.Parent = c
+                    local t = Instance.new("TextLabel")
+                    t.Size = UDim2.new(1, 0, 1, 0)
+                    t.BackgroundTransparency = 1
+                    t.Text = p.Name
+                    t.TextColor3 = Color3.fromRGB(255, 255, 0)
+                    t.Font = Enum.Font.SourceSansBold
+                    t.TextSize = 14
+                    t.Parent = b2
+                end
+            end
+            if p.Character then f() end
+        end
+    end
+end
+
+local function se()
+    for _, c2 in pairs(ec) do
+        c2:Disconnect()
+    end
+    ec = {}
+    for _, p in pairs(P:GetPlayers()) do
+        if p.Character then
+            local h = p.Character:FindFirstChild("BWESP")
+            if h then h:Destroy() end
+            local h2 = p.Character:FindFirstChild("BWNAME")
+            if h2 then h2:Destroy() end
+            local h3 = p.Character:FindFirstChild("BWUNAME")
+            if h3 then h3:Destroy() end
+        end
+    end
+end
+
+local function refresh_pl()
+    for _, child in pairs(pl_sc:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+    for _, p in pairs(P:GetPlayers()) do
+        if p ~= pl then
+            local b = Instance.new("TextButton")
+            b.Size = UDim2.new(0, 95, 0, 20)
+            b.BackgroundColor3 = (p == sel_pl) and Color3.fromRGB(45, 80, 45) or Color3.fromRGB(50, 50, 70)
+            b.BorderSizePixel = 0
+            b.Text = p.Name
+            b.TextColor3 = Color3.fromRGB(255, 255, 255)
+            b.Font = Enum.Font.SourceSansBold
+            b.TextSize = 11
+            b.Parent = pl_sc
+            rc(b, 8)
+            b.MouseButton1Click:Connect(function()
+                sel_pl = p
+                refresh_pl()
+            end)
+        end
+    end
+end
+
+local function tp_to()
+    if not sel_pl then return end
+    local c = pl.Character
+    if not c then return end
+    local r = c:FindFirstChild("HumanoidRootPart")
+    if not r then return end
+    local tc = sel_pl.Character
+    if not tc then return end
+    local tr = tc:FindFirstChild("HumanoidRootPart")
+    if not tr then return end
+    r.CFrame = tr.CFrame * CFrame.new(0, 0, 3)
+end
+
+fb.MouseButton1Click:Connect(function()
+    fy = not fy
+    if fy then
+        fb.Text = "飞行: 开"
+        fb.BackgroundColor3 = Color3.fromRGB(45, 80, 45)
+        bf()
+    else
+        fb.Text = "飞行: 关"
+        fb.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+        sf()
+    end
+end)
+
+wb.MouseButton1Click:Connect(function()
+    wl = not wl
+    if wl then
+        wb.Text = "穿墙: 开"
+        wb.BackgroundColor3 = Color3.fromRGB(45, 80, 45)
+        bw()
+    else
+        wb.Text = "穿墙: 关"
+        wb.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+        sw()
+    end
+end)
+
+eb.MouseButton1Click:Connect(function()
+    es = not es
+    if es then
+        eb.Text = "透视: 开"
+        eb.BackgroundColor3 = Color3.fromRGB(45, 80, 45)
+        be()
+    else
+        eb.Text = "透视: 关"
+        eb.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+        se()
+    end
+end)
+
+sb.MouseButton1Click:Connect(function()
+    sd = sd == 60 and 100 or sd == 100 and 150 or sd == 150 and 200 or 60
+    sb.Text = "速度: " .. sd
+end)
+
+nb.MouseButton1Click:Connect(function()
+    ns = not ns
+    nb.Text = "昵称透视: " .. (ns and "开" or "关")
+    nb.BackgroundColor3 = ns and Color3.fromRGB(45, 80, 45) or Color3.fromRGB(50, 50, 70)
+    if ns then
+        bn()
+    else
+        for _, p in pairs(P:GetPlayers()) do
+            if p.Character then
+                local h2 = p.Character:FindFirstChild("BWNAME")
+                if h2 then h2:Destroy() end
+            end
+        end
+    end
+end)
+
+ub.MouseButton1Click:Connect(function()
+    us = not us
+    ub.Text = "用户名透视: " .. (us and "开" or "关")
+    ub.BackgroundColor3 = us and Color3.fromRGB(45, 80, 45) or Color3.fromRGB(50, 50, 70)
+    if us then
+        bu()
+    else
+        for _, p in pairs(P:GetPlayers()) do
+            if p.Character then
+                local h3 = p.Character:FindFirstChild("BWUNAME")
+                if h3 then h3:Destroy() end
+            end
+        end
+    end
+end)
+
+pb.MouseButton1Click:Connect(function()
+    ps = not ps
+    pb.Text = "秒交互: " .. (ps and "开" or "关")
+    pb.BackgroundColor3 = ps and Color3.fromRGB(45, 80, 45) or Color3.fromRGB(50, 50, 70)
+    if ps then
+        local f = function(v)
+            if v:IsA("ProximityPrompt") then v.HoldDuration = 0 end
+        end
+        for _, v in pairs(workspace:GetDescendants()) do f(v) end
+        pc = workspace.DescendantAdded:Connect(f)
+    else
+        if pc then pc:Disconnect() pc = nil end
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("ProximityPrompt") then v.HoldDuration = 1 end
+        end
+    end
+end)
+
+tb.MouseButton1Click:Connect(function()
+    hideMenu(mn, MN_H)
+    refresh_pl()
+    showMenu(pl_mn, PL_H)
+end)
+
+bk_b.MouseButton1Click:Connect(function()
+    hideMenu(pl_mn, PL_H)
+    showMenu(mn, MN_H)
+end)
+
+tp_b.MouseButton1Click:Connect(function()
+    tp_to()
+end)
+
+local pa_c = P.PlayerAdded:Connect(function()
+    if pl_mn and pl_mn.Parent then refresh_pl() end
+end)
+
+local pr_c = P.PlayerRemoving:Connect(function(p)
+    if p == sel_pl then sel_pl = nil end
+    if pl_mn and pl_mn.Parent then refresh_pl() end
+end)
+
+local ms_speeds = {16, 50, 100, 250, 500}
+local ms_idx = 1
+
+msb.MouseButton1Click:Connect(function()
+    ms_idx = ms_idx % #ms_speeds + 1
+    local speed = ms_speeds[ms_idx]
+    msb.Text = "移速: " .. speed
+    if speed ~= 16 then
+        msb.BackgroundColor3 = Color3.fromRGB(45, 80, 45)
+        if ms_conn then ms_conn:Disconnect() end
+        ms_conn = R.Heartbeat:Connect(function()
+            local c = pl.Character
+            if c then
+                local h = c:FindFirstChildOfClass("Humanoid")
+                if h then h.WalkSpeed = speed end
+            end
+        end)
+    else
+        msb.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+        if ms_conn then ms_conn:Disconnect() ms_conn = nil end
+        local c = pl.Character
+        if c then
+            local h = c:FindFirstChildOfClass("Humanoid")
+            if h then h.WalkSpeed = 16 end
+        end
+    end
+end)
+
+ib.MouseButton1Click:Connect(function()
+    ij = not ij
+    if ij then
+        ib.Text = "无限跳: 开"
+        ib.BackgroundColor3 = Color3.fromRGB(45, 80, 45)
+        ij_conn = U.JumpRequest:Connect(function()
+            local c = pl.Character
+            if c then
+                local h = c:FindFirstChildOfClass("Humanoid")
+                if h then h:ChangeState(Enum.HumanoidStateType.Jumping) end
+            end
+        end)
+    else
+        ib.Text = "无限跳: 关"
+        ib.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+        if ij_conn then ij_conn:Disconnect() ij_conn = nil end
+    end
+end)
+
+cb.MouseButton1Click:Connect(function()
+    if fy then sf() end
+    if wl then sw() end
+    if es then se() end
+    if ps then
+        if pc then pc:Disconnect() end
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("ProximityPrompt") then v.HoldDuration = 1 end
+        end
+    end
+    pa_c:Disconnect()
+    pr_c:Disconnect()
+    if ms_conn then ms_conn:Disconnect() end
+    if ij_conn then ij_conn:Disconnect() end
+    clk_conn:Disconnect()
+    g:Destroy()
+end)
+
+print("BW_LOADED")
